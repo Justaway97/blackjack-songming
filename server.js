@@ -6,11 +6,14 @@ app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname +
         '/dist/blackjack-songming/index.html'));
 });
-app.listen(process.env.PORT || 8080);
-const ws = require('ws').Server(app);
+const http = require('http').Server(app);
 var cors = require('cors');
 app.use(cors());
-const io = require('socket.io')(ws, { cors: { origin: "*" } });
+const io = require('socket.io')(http, {
+    cors: {
+        origin: "*", credentials: true
+    }
+});
 
 
 const table = ['', '', '', '', '']
@@ -282,6 +285,6 @@ io.on('connection', socket => {
     console.log(`Socket ${socket.id} has connected`);
 });
 
-ws.listen(3000, () => {
-    console.log('Listening on port 5000');
+http.listen(process.env.PORT || 8080, () => {
+    console.log('Listening on port 8080');
 });
