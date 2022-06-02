@@ -40,8 +40,6 @@ export class RoomComponent implements OnInit {
     'D2': cardUrl.original,
   }
 
-  // const socket = io("ws://localhost:3000");
-
   constructor(
     protected player: PlayerService,
     protected gameService: GameService,
@@ -55,7 +53,6 @@ export class RoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.socket.on('dealCard', (result: any) => {
-      // console.log('dealCard', result, this.player.socketId)
       if (this.player.socketId === result.id) {
         this.timeout = result.timeout;
         const time = this.timeout - new Date().getTime()
@@ -67,14 +64,12 @@ export class RoomComponent implements OnInit {
           this.player.cardPoint += this.gameService.point[this.gameService.cards.indexOf(card.substring(0, card.length - 1))]
         })
         if (result.dealerCard != undefined && result.dealerCard != '') {
-          // console.log(result.dealerCard)
           this.dealer.card = this.dealer.card.concat(result.dealerCard)
           this.image.D1 = cardUrl[this.dealer.card[0]]
         }
       }
     })
     this.socket.on('myTurn', (result: any) => {
-      // console.log('myTurn', result, this.player.socketId)
       this.timeout = result.timeout;
       const time = this.timeout - new Date().getTime()
       this.timeLeft = Math.floor((time % (1000 * 60)) / 1000);
@@ -86,7 +81,6 @@ export class RoomComponent implements OnInit {
     })
     this.socket.on('endGame', (response: any) => {
       this.player.myTurn = false
-      // console.log('endGame', response)
       this.result = response.players
       this.result.push(...this.result)
       for (let i = this.position - 2; this.position != -1 && i < this.position + 3; i++) {
@@ -95,12 +89,10 @@ export class RoomComponent implements OnInit {
           this.image[('P'.concat((i - this.position + 3).toString(), '2'))] = cardUrl[this.result[i][1]]
         }
       }
-      if (response.dealerCard.length > 3) console.log(this.image)
       this.dealer.card = response.dealerCard
       this.dealer.card.forEach((c, index) => {
         this.image[('D'.concat((index + 1).toString()))] = cardUrl[c]
       })
-      if (response.dealerCard.length > 3) console.log('songming here', this.image)
       this.dealer.cardPoint = response.dealerPoint
       this.timeout = response.timeout;
       const time = this.timeout - new Date().getTime()
@@ -120,7 +112,6 @@ export class RoomComponent implements OnInit {
         this.resetGame()
       }, this.timeout - new Date().getTime())
     })
-    // this.checkAlive();
   }
 
   resetGame() {
@@ -192,8 +183,6 @@ export class RoomComponent implements OnInit {
 
   tryToJoin() {
     this.socket.emit('join', (response: any) => {
-      // console.log('there are', response.numOfPlayer, 'in the room');
-      // console.log('response1', response);
       this.clientIds = response.players
       this.clientIds.push(...this.clientIds)
       if (this.gameService.numOfPlayer !== -1 && this.gameService.numOfPlayer !== response.numOfPlayer) {
