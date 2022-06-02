@@ -15,7 +15,6 @@ const io = require('socket.io')(http, {
     }
 });
 
-
 const table = ['', '', '', '', '']
 let tableAlive = [0, 0, 0, 0, 0]
 let player = [[], [], [], [], []]
