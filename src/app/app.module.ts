@@ -18,7 +18,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { RoomComponent } from './room/room.component';
 
-const config: SocketIoConfig = { url: 'http://localhost:4444', options: {} };
+const config: SocketIoConfig = {
+  url: (process?.env['PORT'] ? 'https://blackjack-songming.herokuapp.com/:' : 'http://localhost:')
+    .concat(process?.env['PORT'] ? process.env['PORT'] : '5000'), options: {}
+};
+
+// const config: SocketIoConfig = { url: 'http://localhost:4444', options: {} };
 
 @NgModule({
   declarations: [
