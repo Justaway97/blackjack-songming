@@ -7,10 +7,10 @@ app.get('/*', function (req, res) {
         '/dist/blackjack-songming/index.html'));
 });
 app.listen(process.env.PORT || 8080);
-const http = require('http').Server(app);
+const ws = require('ws').Server(app);
 var cors = require('cors');
 app.use(cors());
-const io = require('socket.io')(http, { cors: { origin: "*" } });
+const io = require('socket.io')(ws, { cors: { origin: "*" } });
 
 
 const table = ['', '', '', '', '']
@@ -282,6 +282,6 @@ io.on('connection', socket => {
     console.log(`Socket ${socket.id} has connected`);
 });
 
-http.listen(3000, () => {
+ws.listen(3000, () => {
     console.log('Listening on port 5000');
 });
