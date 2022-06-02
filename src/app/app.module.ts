@@ -18,7 +18,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { RoomComponent } from './room/room.component';
 
-const config: SocketIoConfig = { url: 'https://blackjack-songming.herokuapp.com/:5000', options: {} };
+const config: SocketIoConfig = { url: 'https://blackjack-songming.herokuapp.com/:3000', options: {} };
 
 @NgModule({
   declarations: [

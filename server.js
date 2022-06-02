@@ -282,6 +282,6 @@ io.on('connection', socket => {
     console.log(`Socket ${socket.id} has connected`);
 });
 
-http.listen(5000, () => {
+http.listen(3000, () => {
     console.log('Listening on port 5000');
 });
