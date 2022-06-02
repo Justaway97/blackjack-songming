@@ -1,0 +1,69 @@
+<div class="main" [ngStyle]="{ 'transform':rotateDeg }">
+    <ng-container *ngIf="!buttonType || buttonType === null">
+        <button mat-button
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            [matTooltip]="tooltip" matTooltipPosition="above" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'raised'">
+        <button mat-raised-button
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'flat'">
+        <button mat-flat-button
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'stroked'">
+        <button mat-stroked-button
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'icon'">
+        <button mat-icon-button
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <mat-icon>{{ text }}</mat-icon>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'fab'">
+        <button mat-fab
+            [style]="{color: color, padding: padding, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'miniFab'">
+        <button mat-mini-fab
+            [style]="{color: color, 'font-size': fontSize, top: top, left: left, 'background-color':backgroundColor}"
+            matTooltipPosition="above" [matTooltip]="tooltip" (click)="btnClick()" class="onPoint">
+            <span>
+                {{ text }}
+            </span>
+        </button>
+    </ng-container>
+    <ng-container *ngIf="buttonType === 'image'">
+        <button mat-button [ngStyle]="{color: color}" matTooltipPosition="above" [matTooltip]="tooltip"
+            (click)="btnClick()" class="onPoint">
+            <img [ngStyle]="{height: height}" [src]="text">
+        </button>
+    </ng-container>
+</div>

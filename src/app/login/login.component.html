@@ -1,0 +1,12 @@
+<div class="main">
+    <div class="centerColumn">
+        <div class="content">
+            <span>Please enter your username</span>
+            <app-input [formControl]="$any(form.controls['username'])" [required]="true" label="Username">
+            </app-input>
+            <app-button (onClick)="login()" text="submit">
+            </app-button>
+            <app-button (onClick)="reset()" text="reset"></app-button>
+        </div>
+    </div>
+</div>

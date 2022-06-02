@@ -1,0 +1,108 @@
+<div class="main">
+    <ng-container *ngIf="image.D1">
+        <img class="poker-dealer-1" [src]="image.D1">
+    </ng-container>
+    <ng-container *ngIf="image.D2">
+        <img class="poker-dealer-2" [src]="image.D2">
+    </ng-container>
+    <ng-container *ngIf="image.D3">
+        <img class="poker-dealer-3" [src]="image.D3">
+    </ng-container>
+    <ng-container *ngIf="image.D4">
+        <img class="poker-dealer-4" [src]="image.D4">
+    </ng-container>
+    <ng-container *ngIf="image.D5">
+        <img class="poker-dealer-5" [src]="image.D5">
+    </ng-container>
+    <ng-container *ngIf="image.P11">
+        <img class="poker-pikachu-1" [src]="image.P11">
+    </ng-container>
+    <ng-container *ngIf="image.P12">
+        <img class="poker-pikachu-2" [src]="image.P12">
+    </ng-container>
+    <ng-container *ngIf="image.P13">
+        <img class="poker-pikachu-3" [src]="image.P13">
+    </ng-container>
+    <ng-container *ngIf="image.P14">
+        <img class="poker-pikachu-4" [src]="image.P14">
+    </ng-container>
+    <ng-container *ngIf="image.P15">
+        <img class="poker-pikachu-5" [src]="image.P15">
+    </ng-container>
+    <ng-container *ngIf="image.P21">
+        <img class="poker-raquaza-1" [src]="image.P21">
+    </ng-container>
+    <ng-container *ngIf="image.P22">
+        <img class="poker-raquaza-2" [src]="image.P22">
+    </ng-container>
+    <ng-container *ngIf="image.P23">
+        <img class="poker-raquaza-3" [src]="image.P23">
+    </ng-container>
+    <ng-container *ngIf="image.P24">
+        <img class="poker-raquaza-4" [src]="image.P24">
+    </ng-container>
+    <ng-container *ngIf="image.P25">
+        <img class="poker-raquaza-5" [src]="image.P25">
+    </ng-container>
+    <ng-container *ngIf="image.P41">
+        <img class="poker-evee-1" [src]="image.P41">
+    </ng-container>
+    <ng-container *ngIf="image.P42">
+        <img class="poker-evee-2" [src]="image.P42">
+    </ng-container>
+    <ng-container *ngIf="image.P43">
+        <img class="poker-evee-3" [src]="image.P43">
+    </ng-container>
+    <ng-container *ngIf="image.P44">
+        <img class="poker-evee-4" [src]="image.P44">
+    </ng-container>
+    <ng-container *ngIf="image.P45">
+        <img class="poker-evee-5" [src]="image.P45">
+    </ng-container>
+    <ng-container *ngIf="image.P51">
+        <img class="poker-kyurem-1" [src]="image.P51">
+    </ng-container>
+    <ng-container *ngIf="image.P52">
+        <img class="poker-kyurem-2" [src]="image.P42">
+    </ng-container>
+    <ng-container *ngIf="image.P53">
+        <img class="poker-kyurem-3" [src]="image.P53">
+    </ng-container>
+    <ng-container *ngIf="image.P54">
+        <img class="poker-kyurem-4" [src]="image.P44">
+    </ng-container>
+    <ng-container *ngIf="image.P55">
+        <img class="poker-kyurem-5" [src]="image.P45">
+    </ng-container>
+    <ng-container *ngIf="image.P31">
+        <img class="poker-myself-1" [src]="image.P31">
+    </ng-container>
+    <ng-container *ngIf="image.P32">
+        <img class="poker-myself-2" [src]="image.P32">
+    </ng-container>
+    <ng-container *ngIf="image.P33">
+        <img class="poker-myself-3" [src]="image.P33">
+    </ng-container>
+    <ng-container *ngIf="image.P34">
+        <img class="poker-myself-4" [src]="image.P34">
+    </ng-container>
+    <ng-container *ngIf="image.P35">
+        <img class="poker-myself-5" [src]="image.P35">
+    </ng-container>
+    <app-button [backgroundColor]="isMyTurn() && canDraw()? '#7FFF00' : 'grey'" fontSize="40px" class="draw"
+        padding="40%" buttonType="raised" (onClick)="draw()" text="Deal"></app-button>
+    <app-button [backgroundColor]="isMyTurn() ? 'red': 'grey'" fontSize="40px" class="stand" height="10%" width="10%"
+        padding="30%" buttonType="raised" (onClick)="endTurn()" text="Stand"></app-button>
+    <ng-container *ngIf="isMyTurn()">
+        <div class="time">
+            <h2 class="timeLeft">{{ timeLeft >= 0? timeLeft : 0 }}</h2>
+        </div>
+    </ng-container>
+    <div class="info">
+        <h2 class="info-text">name : {{ getUsername() }}</h2>
+        <h2 class="info-text">score : {{ getScore() }}</h2>
+    </div>
+    <ng-container *ngIf="status !== undefined && status !== null && status !== ''">
+        <h1 class="status">{{ status }}</h1>
+    </ng-container>
+</div>

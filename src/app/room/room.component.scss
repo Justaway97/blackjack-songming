@@ -1,0 +1,348 @@
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-size: 100%;
+    background-image: url('../../assets/poker-table.jpg');
+}
+
+.dealer {
+    height: min(18vh, 18vw);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.playerA {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+}
+
+.pikachu {
+    height: min(15vh, 15vw);
+    border-radius: 50%;
+}
+
+.evee {
+    height: min(15vh, 15vw);
+    border-radius: 50%;
+}
+
+.pikachu-player {
+    padding-left: 10%;
+    display: flex;
+    justify-content: flex-start;
+    width: 50%;
+}
+
+.evee-player {
+    padding-right: 10%;
+    display: flex;
+    justify-content: flex-end;
+    width: 50%;
+}
+
+.poker-pikachu-1 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 20%;
+    top: 30%;
+}
+
+.poker-pikachu-2 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 22%;
+    top: 30%;
+}
+
+.poker-pikachu-3 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 24%;
+    top: 30%;
+}
+
+.poker-pikachu-4 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 26%;
+    top: 30%;
+}
+
+.poker-pikachu-5 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 28%;
+    top: 30%;
+}
+
+.poker-raquaza-1 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 20%;
+    top: 50%;
+}
+
+.poker-raquaza-2 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 22%;
+    top: 50%;
+}
+
+.poker-raquaza-3 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 24%;
+    top: 50%;
+}
+
+.poker-raquaza-4 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 26%;
+    top: 50%;
+}
+
+.poker-raquaza-5 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 28%;
+    top: 50%;
+}
+
+.poker-evee-1 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 71%;
+    top: 30%;
+}
+
+.poker-evee-2 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 73%;
+    top: 30%;
+}
+
+.poker-evee-3 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 75%;
+    top: 30%;
+}
+
+.poker-evee-4 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 77%;
+    top: 3%;
+}
+
+.poker-evee-5 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 79%;
+    top: 30%;
+}
+
+.poker-kyurem-1 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 71%;
+    top: 50%;
+}
+
+.poker-kyurem-2 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 73%;
+    top: 50%;
+}
+
+.poker-kyurem-3 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 75%;
+    top: 50%;
+}
+
+.poker-kyurem-4 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 77%;
+    top: 50%;
+}
+
+.poker-kyurem-5 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 79%;
+    top: 50%;
+}
+
+.poker-dealer-1 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 46%;
+    top: 30%;
+}
+
+.poker-dealer-2 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 48%;
+    top: 30%;
+}
+
+.poker-dealer-3 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 50%;
+    top: 30%;
+}
+
+.poker-dealer-4 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 52%;
+    top: 30%;
+}
+
+.poker-dealer-5 {
+    height: min(10vh, 10vw);
+    width: min(7vh, 7vw);
+    position: absolute;
+    left: 54%;
+    top: 30%;
+}
+
+.poker-myself-1 {
+    height: min(15vh, 15vw);
+    width: min(12vh, 12vw);
+    position: absolute;
+    left: 38%;
+    top: 50%;
+}
+
+.poker-myself-2 {
+    height: min(15vh, 15vw);
+    width: min(12vh, 12vw);
+    position: absolute;
+    left: 43%;
+    top: 50%;
+}
+
+.poker-myself-3 {
+    height: min(15vh, 15vw);
+    width: min(12vh, 12vw);
+    position: absolute;
+    left: 48%;
+    top: 50%;
+}
+
+.poker-myself-4 {
+    height: min(15vh, 15vw);
+    width: min(12vh, 12vw);
+    position: absolute;
+    left: 53%;
+    top: 50%;
+}
+
+.poker-myself-5 {
+    height: min(15vh, 15vw);
+    width: min(12vh, 12vw);
+    position: absolute;
+    left: 58%;
+    top: 50%;
+}
+
+.draw {
+    position: absolute;
+    left: 30%;
+    top: 85%;
+    // height: 100%;
+    // width: 100%;
+}
+
+.info {
+    position: absolute;
+    left: 0%;
+    top: 80%;
+    background-color: white;
+    // padding: 10%;
+    // height: 100%;
+    width: 20%;
+    border-bottom-left-radius: 10%;
+    border-bottom-right-radius: 10%;
+    border-top-left-radius: 10%;
+    border-top-right-radius: 10%;
+}
+
+.info-text {
+    padding: 5%;
+    font-size: 3rem;
+}
+
+.status {
+    font-size: 10rem;
+    color: red;
+    font-weight: bold;
+    text-shadow: 2px 2px black;
+    z-index: 100;
+    position: absolute;
+    top: 40%;
+}
+
+.stand {
+    position: absolute;
+    left: 45%;
+    top: 85%;
+}
+
+.time {
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;
+    height: min(10vh, 10vw);
+    width: min(10vh, 10vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 85%;
+    left: 65%;
+}
+
+.timeLeft {
+    padding-top: 30%;
+    font-size: 50px;
+}
