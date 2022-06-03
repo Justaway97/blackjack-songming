@@ -342,3 +342,47 @@
     padding-top: 30%;
     font-size: 50px;
 }
+
+.dealer-text {
+    position: absolute;
+    font-size: 3rem;
+    color: white;
+    z-index: 100;
+    top: 25%;
+}
+
+.P1-text {
+    position: absolute;
+    font-size: 3rem;
+    color: white;
+    z-index: 100;
+    top: 4%;
+    left: 6%;
+}
+
+.P2-text {
+    position: absolute;
+    font-size: 3rem;
+    color: white;
+    z-index: 100;
+    top: 46%;
+    left: 6%;
+}
+
+.P5-text {
+    position: absolute;
+    font-size: 3rem;
+    color: white;
+    z-index: 100;
+    top: 4%;
+    right: 5%;
+}
+
+.P4-text {
+    position: absolute;
+    font-size: 3rem;
+    color: white;
+    z-index: 100;
+    top: 46%;
+    right: 5%;
+}

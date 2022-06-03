@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { cloneDeep } from 'lodash';
 import { Socket } from 'ngx-socket-io';
 import { GameService } from '../service/game.service';
 import { PlayerService } from '../service/player.service';
+import { loginUrl } from '../url';
 import { cardUrl } from './room.component.constant';
 
 @Component({
@@ -11,9 +14,9 @@ import { cardUrl } from './room.component.constant';
 })
 export class RoomComponent implements OnInit {
 
+  dealerText = '';
   clientIds: any[] = [];
   playerNames: any[] = ['', '', '', '', ''];
-  playerIconStyle: any[] = [{}, {}, {}, {}, {}]
   status: any;
   result: any[] = [];
   position: number = -1;
@@ -45,7 +48,11 @@ export class RoomComponent implements OnInit {
     protected player: PlayerService,
     protected gameService: GameService,
     protected socket: Socket,
+    protected router: Router,
   ) {
+    if (this.player.username === '') {
+      this.router.navigateByUrl(loginUrl);
+    }
     this.socket.emit('getId', (response: any) => {
       this.player.socketId = response.socketId;
       console.log('You socket Id are', response.socketId);
@@ -69,6 +76,7 @@ export class RoomComponent implements OnInit {
           this.image.D1 = cardUrl[this.dealer.card[0]]
           this.image.D2 = cardUrl.original
         }
+        this.updatePlayer();
       } else {
         const index = this.clientIds.indexOf(result.id);
 
@@ -83,18 +91,24 @@ export class RoomComponent implements OnInit {
       } else {
         this.player.myTurn = false;
       }
+      this.updatePlayer();
     })
     this.socket.on('endGame', (response: any) => {
+      this.dealerText = '';
       this.player.myTurn = false
       this.result = response.players
-      this.result.push(...this.result)
       const table = response.table
-      console.log('clientIds', this.clientIds)
+      console.log('clientIds', this.clientIds, cloneDeep(this.image), cloneDeep(table), cloneDeep(this.result))
       for (let i = 0; i < 5; i++) {
-        if (this.result[i] && this.result[i][0]) {
-          this.image[('P'.concat((this.clientIds.indexOf(table[i])).toString(), '1'))] = cardUrl[this.result[table.indexOf(this.clientIds[i])][0]]
-          this.image[('P'.concat((this.clientIds.indexOf(table[i])).toString(), '2'))] = cardUrl[this.result[table.indexOf(this.clientIds[i])][1]]
+        if (this.result[i] && this.result[i][0] && this.clientIds.indexOf(table[i]) !== 2) {
+          console.log(('P'.concat((this.clientIds.indexOf(table[i]) + 1).toString(), '1')), table.indexOf(this.clientIds[i]), this.result)
+          this.image[('P'.concat((this.clientIds.indexOf(table[i]) + 1).toString(), '1'))] = cardUrl[this.result[i][0]]
+          this.image[('P'.concat((this.clientIds.indexOf(table[i]) + 1).toString(), '2'))] = cardUrl[this.result[i][1]]
         }
+        // if (this.clientIds.indexOf(response.id) + 1 !== 3) {
+        //   this.image['P'.concat((this.clientIds.indexOf(response.id) + 1).toString(), '1')] = cardUrl.original;
+        //   this.image['P'.concat((this.clientIds.indexOf(response.id) + 1).toString(), '2')] = cardUrl.original;
+        // }
       }
       console.log(this.image, this.result)
       this.dealer.card = response.dealerCard
@@ -125,16 +139,15 @@ export class RoomComponent implements OnInit {
       this.tryToJoin();
     })
     this.socket.on('playerUpdate', (response: any) => {
-      if (response.status !== true) {
-        this.playerNames[this.clientIds.indexOf(response.id)] = response.username
-      } else if (response.status === true) {
-        for (let i = 0; i < this.playerIconStyle.length; i++) {
-          if (i === this.clientIds.indexOf(response.id)) {
-            this.playerIconStyle[this.clientIds.indexOf(response.id)] = { opacity: '30%', color: 'green', 'border-radius': '50%' }
-          } else {
-            this.playerIconStyle[i] = { opacity: '30%', color: 'black', 'border-radius': '50%' }
-          }
-        }
+      console.log('songming', this.playerNames, response, this.clientIds, this.clientIds.indexOf(response.id));
+      if (response.myTurn === true) {
+        this.dealerText = 'Now is '.concat(response.username).concat(' turn')
+        console.log(this.dealerText);
+      }
+      if (this.clientIds.indexOf(response.id) + 1 !== 3) {
+        this.playerNames[this.clientIds.indexOf(response.id)] = response.username[0]
+        this.image['P'.concat((this.clientIds.indexOf(response.id) + 1).toString(), '1')] = cardUrl.original;
+        this.image['P'.concat((this.clientIds.indexOf(response.id) + 1).toString(), '2')] = cardUrl.original;
       }
     })
   }
@@ -149,13 +162,6 @@ export class RoomComponent implements OnInit {
     this.status = null;
     this.clientIds = [];
     this.playerNames = ['', '', '', '', ''];
-    this.playerIconStyle = [
-      { opacity: '30%', color: 'black', 'border-radius': '50%' },
-      { opacity: '30%', color: 'black', 'border-radius': '50%' },
-      { opacity: '30%', color: 'black', 'border-radius': '50%' },
-      { opacity: '30%', color: 'black', 'border-radius': '50%' },
-      { opacity: '30%', color: 'black', 'border-radius': '50%' }
-    ]
     this.image = {
       // 'P11': cardUrl.original,
       // 'P12': cardUrl.original,
@@ -229,6 +235,7 @@ export class RoomComponent implements OnInit {
       } else if (response.position === 2) {
         this.clientIds.push(...response.players)
       }
+      console.log(cloneDeep(this.clientIds))
       if (this.gameService.numOfPlayer !== -1 && this.gameService.numOfPlayer !== response.numOfPlayer) {
         this.gameService.numOfPlayer = response.numOfPlayer;
       }

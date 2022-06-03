@@ -45,31 +45,31 @@
         <img class="poker-raquaza-5" [src]="image.P25">
     </ng-container>
     <ng-container *ngIf="image.P41">
-        <img class="poker-evee-1" [src]="image.P41">
+        <img class="poker-kyurem-1" [src]="image.P41">
     </ng-container>
     <ng-container *ngIf="image.P42">
-        <img class="poker-evee-2" [src]="image.P42">
-    </ng-container>
-    <ng-container *ngIf="image.P43">
-        <img class="poker-evee-3" [src]="image.P43">
-    </ng-container>
-    <ng-container *ngIf="image.P44">
-        <img class="poker-evee-4" [src]="image.P44">
-    </ng-container>
-    <ng-container *ngIf="image.P45">
-        <img class="poker-evee-5" [src]="image.P45">
-    </ng-container>
-    <ng-container *ngIf="image.P51">
-        <img class="poker-kyurem-1" [src]="image.P51">
-    </ng-container>
-    <ng-container *ngIf="image.P52">
         <img class="poker-kyurem-2" [src]="image.P42">
     </ng-container>
+    <ng-container *ngIf="image.P43">
+        <img class="poker-kyurem-3" [src]="image.P43">
+    </ng-container>
+    <ng-container *ngIf="image.P44">
+        <img class="poker-kyurem-4" [src]="image.P44">
+    </ng-container>
+    <ng-container *ngIf="image.P45">
+        <img class="poker-kyurem-5" [src]="image.P45">
+    </ng-container>
+    <ng-container *ngIf="image.P51">
+        <img class="poker-evee-1" [src]="image.P51">
+    </ng-container>
+    <ng-container *ngIf="image.P52">
+        <img class="poker-evee-2" [src]="image.P42">
+    </ng-container>
     <ng-container *ngIf="image.P53">
-        <img class="poker-kyurem-3" [src]="image.P53">
+        <img class="poker-evee-3" [src]="image.P53">
     </ng-container>
     <ng-container *ngIf="image.P54">
-        <img class="poker-kyurem-4" [src]="image.P44">
+        <img class="poker-evee-4" [src]="image.P44">
     </ng-container>
     <ng-container *ngIf="image.P55">
         <img class="poker-kyurem-5" [src]="image.P45">
@@ -105,8 +105,13 @@
     <ng-container *ngIf="status !== undefined && status !== null && status !== ''">
         <h1 class="status">{{ status }}</h1>
     </ng-container>
-    <!-- <div [style]="playerIconStyle[0]"></div>
-    <div [style]="playerIconStyle[1]"></div>
-    <div [style]="playerIconStyle[4]"></div>
-    <div [style]="playerIconStyle[5]"></div> -->
+    <span class="dealer-text">{{ dealerText }}</span>
+    <span class="P1-text">{{ playerNames[0] }}</span>
+    <span class="P2-text">{{ playerNames[1] }}</span>
+    <span class="P4-text">{{ playerNames[3] }}</span>
+    <span class="P5-text">{{ playerNames[4] }}</span>
+    <!-- <span class="P1-text">songming</span>
+    <span class="P2-text">chewye</span>
+    <span class="P4-text">songming</span>
+    <span class="P5-text">chewye</span> -->
 </div>

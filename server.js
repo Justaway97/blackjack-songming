@@ -252,8 +252,9 @@ io.on('connection', socket => {
                 prevTable[i] = table[i]
             }
         }
+        console.log('songming', table, table.indexOf(socket.client.id), socket.client.id)
         callback({
-            position: j,
+            position: table.indexOf(socket.client.id),
             newGame: !playing,
             numOfPlayer: numOfClient,
             players: table
