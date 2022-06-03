@@ -6,16 +6,20 @@ app.get('/*', function (req, res) {
     res.sendFile(path.join(__dirname +
         '/dist/blackjack-songming/index.html'));
 });
-app.listen(process.env.PORT || 8080);
 const http = require('http').Server(app);
 var cors = require('cors');
 app.use(cors());
-const io = require('socket.io')(http, { cors: { origin: "*" } });
+const io = require('socket.io')(http, {
+    cors: {
+        origin: "*", credentials: true
+    }
+});
 
-
-const table = ['', '', '', '', '']
+let table = ['', '', '', '', '']
+let prevTable = ['', '', '', '', '']
 let tableAlive = [0, 0, 0, 0, 0]
 let player = [[], [], [], [], []]
+let playerName = ['', '', '', '', '']
 const dealer = {
     point: 0,
     cardPoint: 0,
@@ -105,22 +109,25 @@ function dealerTurn(socket, callback) {
         dealerPoint: dealer.cardPoint,
         dealerCard: dealer.cards,
         players: player,
-        timeout: timeout
+        timeout: timeout,
+        table: table
     })
     player = [[], [], [], [], []]
+    table = ['', '', '', '', '']
     dealer.cards = [];
     dealer.cardPoint = 0;
-    playing = false;
+    console.log('dealer card ->', dealer.cards)
     setTimeout(function () {
-        newGame(socket, callback)
+        playing = false;
+        io.emit('checkNumberOfPlayer')
     }, timeout - new Date().getTime() + 1000)
 }
 
 function newGame(socket, callback) {
+    playing = true
     console.log('')
     console.log('')
     console.log('new Game')
-    playing = true;
     currentPlayer = '';
     tableAlive = [0, 0, 0, 0, 0]
     if (playingCards.length < 15) {
@@ -179,7 +186,7 @@ function playerTimeOut(i, socket, callback) {
                             }
                         }
                         timeout = new Date().getTime() + 5000
-                        tableAlive[j + 1] = timeout
+                        // tableAlive[j + 1] = timeout
                         playerTimeOut(j + 1, socket, callback)
                     }
                     return;
@@ -188,6 +195,7 @@ function playerTimeOut(i, socket, callback) {
         }, tableAlive[i] - new Date().getTime())
     }
     if (i >= table.length) {
+        console.log('dealer Turn')
         dealerTurn(socket, callback)
     }
 }
@@ -221,18 +229,27 @@ io.on('connection', socket => {
     socket.on("join", (callback) => {
         let j = -1
         numOfClient = -1
+        console.log('playing=', playing)
         if (playing == false) {
             const clientsArray = Object.keys(io.engine.clients);
             numOfClient = clientsArray.length
             for (let i = 0; i < clientsArray.length; i++) {
                 if (!table.includes(clientsArray[i])) {
-                    for (j = 0; j < table.length; j++) {
-                        if (table[j] == '') {
-                            table[j] = clientsArray[i];
-                            break;
+                    if (prevTable.includes(clientsArray[i])) {
+                        table[prevTable.indexOf(clientsArray[i])] = clientsArray[i];
+                        j = prevTable.indexOf(clientsArray[i])
+                    } else {
+                        for (j = 0; j < table.length; j++) {
+                            if (table[j] == '') {
+                                table[j] = clientsArray[i];
+                                break;
+                            }
                         }
                     }
                 }
+            }
+            for (let i = 0; i < table.length; i++) {
+                prevTable[i] = table[i]
             }
         }
         callback({
@@ -279,9 +296,18 @@ io.on('connection', socket => {
         socket.disconnect();
     });
 
+    socket.on('updatePlayer', (username, socketId, myTurn) => {
+        io.emit('playerUpdate', {
+            id: socketId,
+            username: username,
+            myTurn: myTurn
+        })
+    })
+
     console.log(`Socket ${socket.id} has connected`);
+    io.emit('checkNumberOfPlayer')
 });
 
-http.listen(4444, () => {
-    console.log('Listening on port 4444');
+http.listen(process.env.PORT || 8080, () => {
+    console.log('Listening on port 8080');
 });

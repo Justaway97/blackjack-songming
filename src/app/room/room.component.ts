@@ -12,10 +12,11 @@ import { cardUrl } from './room.component.constant';
 export class RoomComponent implements OnInit {
 
   clientIds: any[] = [];
+  playerNames: any[] = ['', '', '', '', ''];
+  playerIconStyle: any[] = [{}, {}, {}, {}, {}]
   status: any;
   result: any[] = [];
   position: number = -1;
-  isJoin = false;
   timeout = 0;
   dealer: { username: string, cardPoint: Number, card: any[] } = {
     username: 'dealer',
@@ -26,18 +27,18 @@ export class RoomComponent implements OnInit {
   timeLeft: number = 0;
   canJoin = true;
   image: any = {
-    'P11': cardUrl.original,
-    'P12': cardUrl.original,
-    'P21': cardUrl.original,
-    'P22': cardUrl.original,
-    'P31': cardUrl.original,
-    'P32': cardUrl.original,
-    'P41': cardUrl.original,
-    'P42': cardUrl.original,
-    'P51': cardUrl.original,
-    'P52': cardUrl.original,
-    'D1': cardUrl.original,
-    'D2': cardUrl.original,
+    // 'P11': cardUrl.original,
+    // 'P12': cardUrl.original,
+    // 'P21': cardUrl.original,
+    // 'P22': cardUrl.original,
+    // 'P31': cardUrl.original,
+    // 'P32': cardUrl.original,
+    // 'P41': cardUrl.original,
+    // 'P42': cardUrl.original,
+    // 'P51': cardUrl.original,
+    // 'P52': cardUrl.original,
+    // 'D1': cardUrl.original,
+    // 'D2': cardUrl.original,
   }
 
   constructor(
@@ -66,7 +67,11 @@ export class RoomComponent implements OnInit {
         if (result.dealerCard != undefined && result.dealerCard != '') {
           this.dealer.card = this.dealer.card.concat(result.dealerCard)
           this.image.D1 = cardUrl[this.dealer.card[0]]
+          this.image.D2 = cardUrl.original
         }
+      } else {
+        const index = this.clientIds.indexOf(result.id);
+
       }
     })
     this.socket.on('myTurn', (result: any) => {
@@ -83,12 +88,15 @@ export class RoomComponent implements OnInit {
       this.player.myTurn = false
       this.result = response.players
       this.result.push(...this.result)
-      for (let i = this.position - 2; this.position != -1 && i < this.position + 3; i++) {
+      const table = response.table
+      console.log('clientIds', this.clientIds)
+      for (let i = 0; i < 5; i++) {
         if (this.result[i] && this.result[i][0]) {
-          this.image[('P'.concat((i - this.position + 3).toString(), '1'))] = cardUrl[this.result[i][0]]
-          this.image[('P'.concat((i - this.position + 3).toString(), '2'))] = cardUrl[this.result[i][1]]
+          this.image[('P'.concat((this.clientIds.indexOf(table[i])).toString(), '1'))] = cardUrl[this.result[table.indexOf(this.clientIds[i])][0]]
+          this.image[('P'.concat((this.clientIds.indexOf(table[i])).toString(), '2'))] = cardUrl[this.result[table.indexOf(this.clientIds[i])][1]]
         }
       }
+      console.log(this.image, this.result)
       this.dealer.card = response.dealerCard
       this.dealer.card.forEach((c, index) => {
         this.image[('D'.concat((index + 1).toString()))] = cardUrl[c]
@@ -112,6 +120,23 @@ export class RoomComponent implements OnInit {
         this.resetGame()
       }, this.timeout - new Date().getTime())
     })
+    this.socket.on('checkNumberOfPlayer', () => {
+      console.log('try to join');
+      this.tryToJoin();
+    })
+    this.socket.on('playerUpdate', (response: any) => {
+      if (response.status !== true) {
+        this.playerNames[this.clientIds.indexOf(response.id)] = response.username
+      } else if (response.status === true) {
+        for (let i = 0; i < this.playerIconStyle.length; i++) {
+          if (i === this.clientIds.indexOf(response.id)) {
+            this.playerIconStyle[this.clientIds.indexOf(response.id)] = { opacity: '30%', color: 'green', 'border-radius': '50%' }
+          } else {
+            this.playerIconStyle[i] = { opacity: '30%', color: 'black', 'border-radius': '50%' }
+          }
+        }
+      }
+    })
   }
 
   resetGame() {
@@ -122,19 +147,28 @@ export class RoomComponent implements OnInit {
     this.dealer.cardPoint = 0;
     this.position = -1;
     this.status = null;
+    this.clientIds = [];
+    this.playerNames = ['', '', '', '', ''];
+    this.playerIconStyle = [
+      { opacity: '30%', color: 'black', 'border-radius': '50%' },
+      { opacity: '30%', color: 'black', 'border-radius': '50%' },
+      { opacity: '30%', color: 'black', 'border-radius': '50%' },
+      { opacity: '30%', color: 'black', 'border-radius': '50%' },
+      { opacity: '30%', color: 'black', 'border-radius': '50%' }
+    ]
     this.image = {
-      'P11': cardUrl.original,
-      'P12': cardUrl.original,
-      'P21': cardUrl.original,
-      'P22': cardUrl.original,
-      'P31': cardUrl.original,
-      'P32': cardUrl.original,
-      'P41': cardUrl.original,
-      'P42': cardUrl.original,
-      'P51': cardUrl.original,
-      'P52': cardUrl.original,
-      'D1': cardUrl.original,
-      'D2': cardUrl.original,
+      // 'P11': cardUrl.original,
+      // 'P12': cardUrl.original,
+      // 'P21': cardUrl.original,
+      // 'P22': cardUrl.original,
+      // 'P31': cardUrl.original,
+      // 'P32': cardUrl.original,
+      // 'P41': cardUrl.original,
+      // 'P42': cardUrl.original,
+      // 'P51': cardUrl.original,
+      // 'P52': cardUrl.original,
+      // 'D1': cardUrl.original,
+      // 'D2': cardUrl.original,
     }
   }
 
@@ -151,13 +185,8 @@ export class RoomComponent implements OnInit {
   ngAfterViewInit() {
     setInterval(() => {
       this.timeLeft -= 1;
-      if (this.isJoin === false && this.player.card.length === 0 && this.dealer.card.length === 0) {
-        this.tryToJoin();
-        this.isJoin = true;
-      }
     }, 1000)
   }
-
   calculatePlayerPoint() {
     this.player.myTurn = false;
     if (this.player.cardPoint < 12) {
@@ -183,15 +212,40 @@ export class RoomComponent implements OnInit {
 
   tryToJoin() {
     this.socket.emit('join', (response: any) => {
-      this.clientIds = response.players
-      this.clientIds.push(...this.clientIds)
+      this.position = response.position;
+      console.log('position =', this.position)
+      if (response.position < 2) {
+        for (let i = response.position + 3; i < 5; i++) {
+          this.clientIds.push(response.players[i])
+        }
+        this.clientIds.push(...response.players)
+      } else if (response.position > 2) {
+        for (let i = response.position - 3; i < 5; i++) {
+          this.clientIds.push(response.players[i])
+        }
+        for (let i = 0; i < response.position; i++) {
+          this.clientIds.push(response.players[i])
+        }
+      } else if (response.position === 2) {
+        this.clientIds.push(...response.players)
+      }
       if (this.gameService.numOfPlayer !== -1 && this.gameService.numOfPlayer !== response.numOfPlayer) {
         this.gameService.numOfPlayer = response.numOfPlayer;
       }
-      if (this.gameService.numOfPlayer > 5) {
-        this.socket.emit('forceDisconnect')
+      if (this.position !== -1) {
+        this.updatePlayer()
       }
-      this.position = response.position + 5
+
+      //   1 -> 3 , 2 -> 4, 3 -> 5, 4 -> 1, 5 -> 2
+      // last 2 move to front
+      //   2 -> 3 , 3 -> 4, 4 -> 5, 5 -> 1, 1 -> 2
+      // last 1 move to front
+      //   3 -> 3 , 4 -> 4, 5 -> 5, 1 -> 1, 2 -> 2
+      // no move
+      //   4 -> 3 , 5 -> 4, 1 -> 5, 2 -> 1, 3 -> 2
+      // first 1 move to back
+      //   5 -> 3 , 1 -> 4, 2 -> 5, 3 -> 1, 4 -> 2
+      // first 2 move to back
     })
   }
 
@@ -249,6 +303,10 @@ export class RoomComponent implements OnInit {
       this.player.score += 5;
     }
     return oldScore;
+  }
+
+  updatePlayer() {
+    this.socket.emit('updatePlayer', this.player.username, this.player.socketId, this.isMyTurn());
   }
 
   getUsername() {

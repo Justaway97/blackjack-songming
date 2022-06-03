@@ -1,10 +1,13 @@
 # BlackjackSongming
 
+The code is uploaded to https://github.com/Justaway97/blackjack-songming
+You can have a online version at https://blackjack-songming.herokuapp.com/
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 13.3.6.
 
 ## Development server
 
-Run `npm run start` for a dev server. Navigate to `http://localhost:8080/`. The application will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
