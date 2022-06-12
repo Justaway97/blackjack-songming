@@ -209,17 +209,6 @@ export class RoomComponent implements OnInit {
     return this.dealer.cardPoint;
   }
 
-  getDealerCard() {
-    let card = ''
-    this.dealer.card.forEach((c, index) => {
-      card += c
-      if (index < this.dealer.card.length - 1) {
-        card += ', '
-      }
-    })
-    return card
-  }
-
   getDealerImage(index: any) {
     if (this.dealer.images.length > index) {
       if (index === 1 && !this.dealer.displayAll) {
