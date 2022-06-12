@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 app.use(express.static(__dirname + '/dist/blackjack-songming'));
-app.get('/*', function (req, res) {
+app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname +
         '/dist/blackjack-songming/index.html'));
 });
@@ -15,20 +15,31 @@ const io = require('socket.io')(http, {
     }
 });
 
-let table = ['', '', '', '', '']
-let prevTable = ['', '', '', '', '']
-let tableAlive = [0, 0, 0, 0, 0]
-let player = [[], [], [], [], []]
-let playerName = ['', '', '', '', '']
-const dealer = {
-    point: 0,
+let players = [initPlayer(), initPlayer(), initPlayer(), initPlayer(), initPlayer()]
+let lastMatchTable = [initPlayer(), initPlayer(), initPlayer(), initPlayer(), initPlayer()]
+let isPlaying = false
+let dealer = {
+    username: 'dealer',
     cardPoint: 0,
-    cards: []
+    card: [],
 }
-let playing = false
+let ableToJoin = true
 
-const cards = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
-const points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
+const points = {
+    'A': 1,
+    '2': 2,
+    '3': 3,
+    '4': 4,
+    '5': 5,
+    '6': 6,
+    '7': 7,
+    '8': 8,
+    '9': 9,
+    '10': 10,
+    'J': 10,
+    'Q': 10,
+    'K': 10
+}
 const baseCard = [
     'AS', 'AH', 'AC', 'AD', '2S', '2H', '2C', '2D', '3S', '3H', '3C', '3D',
     '4S', '4H', '4C', '4D', '5S', '5H', '5C', '5D', '6S', '6H', '6C', '6D',
@@ -44,6 +55,24 @@ const playingCards = [
     'KS', 'KH', 'KC', 'KD'
 ]
 
+function initPlayer() {
+    return {
+        username: '',
+        // score: 0,
+        card: [],
+        id: '',
+        alive: 0,
+    }
+}
+
+function resetGame() {
+    for (let i = 0; i < players.length; i++) {
+        players[i] = initPlayer()
+    }
+    dealer.card = []
+    dealer.cardPoint = 0
+}
+
 function shuffleArray(array) {
     for (var j = 0; j < 1; j++) {
         for (var i = array.length - 1; i > 0; i--) {
@@ -55,255 +84,204 @@ function shuffleArray(array) {
     }
 }
 
-function updateDealerPoint() {
-    for (let i = 0; i < dealer.cards.length; i++) {
-        if (dealer.cards[i].startsWith('A') && dealer.cardPoint < 12) {
+function updateDealerPoint(index) {
+    for (let i = index; i < dealer.card.length; i++) {
+        if (dealer.card[i].startsWith('A') && dealer.cardPoint < 12) {
             dealer.cardPoint += 10
         }
     }
 }
 
-function deal(socket, data) {
+function deal(data) {
     const card = playingCards.splice(0, 1);
-    dealCard(socket, card, data.id);
+    dealCard(card, data.id, true);
 }
 
 function dealerDraw() {
     const card = playingCards.splice(0, 1);
-    dealer.cards = dealer.cards.concat(card[0]);
-    dealer.cardPoint += points[cards.indexOf(card[0].substring(0, card[0].length - 1))];
+    dealer.card = dealer.card.concat(card[0]);
+    dealer.cardPoint += points[card[0].substring(0, card[0].length - 1)];
 }
 
-function dealCard(socket, card, t) {
-    const index = table.indexOf(t)
-    tableAlive[index] = new Date().getTime() + 5000
-    let dealerCard = ''
-    if (dealer.cards.length == 1) {
-        dealerCard = dealer.cards[0]
-    }
-    player[index] = player[index].concat(card)
+function dealCard(card, id, isPlayerDraw) {
+    const index = players.findIndex(player => player.id == id)
+    players[index].alive = new Date().getTime() + 5000
+    players[index].card = players[index].card.concat(card)
     io.emit('dealCard', {
-        timeout: tableAlive[index],
-        id: t,
+        timeout: players[index].alive,
+        id: id,
         card: card,
-        dealerCard: dealerCard
+        dealerCard: isPlayerDraw ? undefined : dealer.card[dealer.card.length - 1]
     });
-    console.log('successfully distribute', card, 'card to', t);
+    console.log('successfully distribute', card, 'card to', id);
 }
 
-function dealerTurn(socket, callback) {
-    currentPlayer = '';
+function dealerTurn() {
     console.log("Now is dealer turn");
-    updateDealerPoint();
-    while (dealer.cardPoint < 16) {
+    updateDealerPoint(0);
+    while (dealer.cardPoint < 16 && dealer.card.length < 5) {
         dealerDraw();
-        updateDealerPoint();
+        updateDealerPoint(dealer.card.length - 1);
     }
     timeout = new Date().getTime() + 5000
-    for (let i = 0; i < table.length; i++) {
-        if (table[i] != '') {
-            console.log('Player', table[i], 'has', player[i])
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].username != '') {
+            console.log('Player', players[i].username, 'has', players[i].card)
         }
     }
     io.emit('endGame', {
         dealerPoint: dealer.cardPoint,
-        dealerCard: dealer.cards,
-        players: player,
+        dealerCard: dealer.card,
+        players: players,
         timeout: timeout,
-        table: table
     })
-    player = [[], [], [], [], []]
-    table = ['', '', '', '', '']
-    dealer.cards = [];
-    dealer.cardPoint = 0;
-    console.log('dealer card ->', dealer.cards)
+    resetGame();
     setTimeout(function () {
-        playing = false;
+        isPlaying = false;
+        ableToJoin = true;
         io.emit('checkNumberOfPlayer')
     }, timeout - new Date().getTime() + 1000)
 }
 
-function newGame(socket, callback) {
-    playing = true
+function newGame() {
     console.log('')
     console.log('')
     console.log('new Game')
-    currentPlayer = '';
-    tableAlive = [0, 0, 0, 0, 0]
+    for (let i = 0; i < players.length; i++) {
+        players[i].alive = 0
+    }
     if (playingCards.length < 15) {
         for (let i = 0; i < baseCard.length; i++) {
             playingCards[i] = baseCard[i];
         }
     }
-    console.log('there are', table, 'players')
+    let numberOfPlayer = 0
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].id != '') {
+            numberOfPlayer++
+        }
+    }
+    console.log('there are', numberOfPlayer, 'players')
     shuffleArray(playingCards)
-    distributeCard(socket)
-    distributeCard(socket)
-    console.log('dealer card ->', dealer.cards)
+    distributeCard()
+    distributeCard()
+    console.log('dealer card ->', dealer.card)
     selectedPlayer = ''
     let i = 0
-    for (; i < table.length; i++) {
-        if (table[i] != '') {
+    for (; i < players.length; i++) {
+        if (players[i].id != '') {
             break;
         }
     }
-    tableAlive[i] = new Date().getTime()
-    if (i < table.length) {
-        tableAlive[i] += 5000
-        console.log('now is', table[i], 'turn')
+    if (i < players.length) {
+        players[i].alive = new Date().getTime()
+        players[i].alive += 5000
+        console.log('now is', players[i], 'turn')
         io.emit('myTurn', {
-            dealerCard: dealer.cards[0],
-            timeout: tableAlive[i],
-            id: table[i]
+            dealerCard: dealer.card[0],
+            timeout: players[i].alive,
+            id: players[i].id
         })
     }
-    playerTimeOut(i, socket, callback);
+    playerTimeOut(i);
 }
 
-function playerTimeOut(i, socket, callback) {
-    if (i < table.length) {
-        setTimeout(function () {
-            for (; i < table.length; i++) {
-                if (table[i] != '') {
-                    if (Math.abs(tableAlive[i] - new Date().getTime()) > 100) {
-                        tableAlive[i] = new Date().getTime()
-                        i -= 1
-                        playerTimeOut(i + 1, socket, callback)
-                    } else {
-                        let j = i + 1
-                        for (; j < table.length - 1; j++) {
-                            if (table[j] != '') {
-                                timeout = new Date().getTime() + 5000
-                                tableAlive[j] = timeout
-                                console.log('now is', table[j], 'turn')
-                                io.emit('myTurn', {
-                                    dealerCard: dealer.cards[0],
-                                    timeout: timeout,
-                                    id: table[j]
-                                })
-                                playerTimeOut(j, socket, callback)
-                                return;
-                            }
-                        }
-                        timeout = new Date().getTime() + 5000
-                        // tableAlive[j + 1] = timeout
-                        playerTimeOut(j + 1, socket, callback)
-                    }
+function playerTimeOut(i) {
+    let j = 0
+    if (i < players.length) {
+        setTimeout(() => {
+            if (Math.abs(players[i].alive - new Date().getTime()) > 100) {
+                if (players[i].alive < new Date().getTime()) {
+                    players[i].alive = new Date().getTime()
+                }
+                playerTimeOut(i)
+                return;
+            }
+            for (j = i + 1; j < players.length; j++) {
+                if (players[j].id != '') {
+                    players[j].alive = new Date().getTime() + 5000
+                    console.log('now is', players[j].id, 'turn')
+                    io.emit('myTurn', {
+                        timeout: players[j].alive,
+                        id: players[j].id
+                    })
+                    playerTimeOut(j)
                     return;
                 }
             }
-        }, tableAlive[i] - new Date().getTime())
-    }
-    if (i >= table.length) {
-        console.log('dealer Turn')
-        dealerTurn(socket, callback)
+            if (j >= players.length) {
+                dealerTurn()
+            }
+        }, players[i].alive - new Date().getTime())
     }
 }
 
-function distributeCard(socket) {
-    let numberOfPlayer = 0
-    for (let i = 0; i < table.length; i++) {
-        if (table[i] != '') {
-            numberOfPlayer += 1
-        }
-    }
-    const removeCards = playingCards.splice(0, ((numberOfPlayer + 1)))
+function distributeCard() {
+    const removeCards = playingCards.splice(0, ((Object.keys(io.engine.clients).length + 1)))
+    console.log('remove', removeCards)
     const dealerCards = removeCards.splice(0, 1);
-    dealer.cards = dealer.cards.concat(dealerCards[0]);
-    dealer.cardPoint += points[cards.indexOf(dealerCards[0].substring(0, dealerCards[0].length - 1))];
-    for (let i = 0; i < table.length; i++) {
-        if (table[i] != '') {
-            dealCard(socket, removeCards.splice(0, 1), table[i]);
+    dealer.card = dealer.card.concat(dealerCards[0]);
+    dealer.cardPoint += points[dealerCards[0].substring(0, dealerCards[0].length - 1)];
+    for (let i = 0; i < players.length; i++) {
+        if (players[i].id != '') {
+            dealCard(removeCards.splice(0, 1), players[i].id, false);
         }
     }
 }
 
 io.on('connection', socket => {
-    let previousId;
-    const safeJoin = currentId => {
-        socket.leave(previousId);
-        socket.join(currentId, () => console.log(`Socket ${socket.id} joined room ${currentId}`));
-        previousId = currentId;
-    }
-
-    socket.on("join", (callback) => {
-        let j = -1
-        numOfClient = -1
-        console.log('playing=', playing)
-        if (playing == false) {
+    socket.emit('getId', { 'id': socket.client.id });
+    socket.on("join", (player, callback) => {
+        if (ableToJoin == true) {
+            ableToJoin = false
             const clientsArray = Object.keys(io.engine.clients);
-            numOfClient = clientsArray.length
             for (let i = 0; i < clientsArray.length; i++) {
-                if (!table.includes(clientsArray[i])) {
-                    if (prevTable.includes(clientsArray[i])) {
-                        table[prevTable.indexOf(clientsArray[i])] = clientsArray[i];
-                        j = prevTable.indexOf(clientsArray[i])
+                if (players.findIndex(p => p.id == clientsArray[i]) == -1) {
+                    const lastMatchIndex = lastMatchTable.findIndex(last => last.id == clientsArray[i])
+                    if (lastMatchIndex != -1) {
+                        players[lastMatchIndex].id = lastMatchTable[lastMatchIndex].id;
+                        players[lastMatchIndex].username = lastMatchTable[lastMatchIndex].username;
                     } else {
-                        for (j = 0; j < table.length; j++) {
-                            if (table[j] == '') {
-                                table[j] = clientsArray[i];
+                        for (let j = 0; j < players.length; j++) {
+                            if (players[j].id == '') {
+                                players[j].id = clientsArray[i];
+                                if (players[j].id === player.socketId) {
+                                    players[j].username = player.username[0];
+                                }
                                 break;
                             }
                         }
                     }
                 }
             }
-            for (let i = 0; i < table.length; i++) {
-                prevTable[i] = table[i]
+            for (let i = 0; i < players.length; i++) {
+                lastMatchTable[i].id = players[i].id
+                lastMatchTable[i].username = players[i].username
             }
         }
-        console.log('songming', table, table.indexOf(socket.client.id), socket.client.id)
         callback({
-            position: table.indexOf(socket.client.id),
-            newGame: !playing,
-            numOfPlayer: numOfClient,
-            players: table
+            position: players.findIndex(player => player.id == socket.client.id),
+            ableToJoin: !ableToJoin,
+            players: players
         });
-        if (playing == false) {
-            newGame(socket, callback)
-        }
+
+        setTimeout(function () {
+            if (isPlaying == false) {
+                isPlaying = true
+                newGame()
+            }
+        }, 3000)
     });
 
-    socket.on('getClientList', (callback) => {
-        const clientsArray = Object.keys(io.engine.clients);
-        for (let i = 0; i < clientsArray.length; i++) {
-            if (!table.includes(client)) {
-                for (let j = 0; j < table.length; j++) {
-                    if (table[j] == '') {
-                        table[j] = client;
-                        break;
-                    }
-                }
-            }
-        }
-        callback({
-            clients: table
-        })
-    })
-
-    socket.on('getId', (callback) => {
-        callback({
-            socketId: socket.client.id
-        })
-    })
-
     socket.on('deal', (data) => {
-        if (table.indexOf(data.id) != -1) {
-            deal(socket, data)
+        if (players.findIndex(player => player.id == data.id) != -1) {
+            deal(data)
         }
     });
 
     socket.on('forceDisconnect', () => {
         socket.disconnect();
     });
-
-    socket.on('updatePlayer', (username, socketId, myTurn) => {
-        io.emit('playerUpdate', {
-            id: socketId,
-            username: username,
-            myTurn: myTurn
-        })
-    })
 
     console.log(`Socket ${socket.id} has connected`);
     io.emit('checkNumberOfPlayer')

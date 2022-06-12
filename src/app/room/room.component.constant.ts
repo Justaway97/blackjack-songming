@@ -53,3 +53,11 @@ export const cardUrl: any = {
     'KC': '../assets/KC.png',
     'KD': '../assets/KD.png',
 }
+
+export const pokemon: any[] = [
+    'pikachu',
+    'raquaza',
+    'myself',
+    'kyurem',
+    'evee',
+]
