@@ -176,7 +176,7 @@ function newGame() {
     if (i < players.length) {
         players[i].alive = new Date().getTime()
         players[i].alive += 5000
-        console.log('now is', players[i], 'turn')
+        console.log('now is', players[i].username, 'turn')
         io.emit('myTurn', {
             dealerCard: dealer.card[0],
             timeout: players[i].alive,
@@ -200,7 +200,7 @@ function playerTimeOut(i) {
             for (j = i + 1; j < players.length; j++) {
                 if (players[j].id != '') {
                     players[j].alive = new Date().getTime() + 5000
-                    console.log('now is', players[j].id, 'turn')
+                    console.log('now is', players[j].username, 'turn')
                     io.emit('myTurn', {
                         timeout: players[j].alive,
                         id: players[j].id
@@ -261,7 +261,6 @@ io.on('connection', socket => {
         }
         callback({
             position: players.findIndex(player => player.id == socket.client.id),
-            ableToJoin: !ableToJoin,
             players: players
         });
 

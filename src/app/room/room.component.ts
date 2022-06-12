@@ -97,7 +97,7 @@ export class RoomComponent implements OnInit {
         }, 1000)
         setTimeout(() => {
           this.resetGame()
-        }, response.timeout - new Date().getTime() - 1000)
+        }, response.timeout - new Date().getTime() - 1500)
       }
     })
     this.socket.on('checkNumberOfPlayer', () => {
@@ -143,7 +143,7 @@ export class RoomComponent implements OnInit {
 
   tryToJoin() {
     this.socket.emit('join', this.player.players[2], (response: any) => {
-      if (response.ableToJoin) {
+      if (response.position !== -1) {
         this.isPlaying = true;
         for (let index = 0, i = 3, serverPlayerIndex = response.position + 1; index < 4; index++, i++, serverPlayerIndex++) {
           if (serverPlayerIndex > 4) {
