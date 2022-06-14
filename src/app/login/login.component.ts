@@ -35,6 +35,7 @@ export class LoginComponent extends FormComponent {
     if (this.form.value.username !== undefined && this.form.value.username !== '') {
       this.playerService.players[2].username = this.form.value.username;
       this.playerService.players[2].score = 100;
+      console.log(this.playerService.players[2]);
       this.router.navigateByUrl(roomUrl);
     }
   }

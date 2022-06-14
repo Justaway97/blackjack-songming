@@ -137,10 +137,18 @@ export class PlayerService {
       this.players[index].score += 10;
     }
 
-    if (dealer.dealerCard.length === 2 && dealer.dealerPoint === 21 && this.players[index].cardPoint !== 21) {
-      this.players[index].score -= 5;
-    } else if (this.players[index].card.length === 2 && this.players[index].cardPoint === 21 && dealer.dealerPoint !== 21) {
-      this.players[index].score += 5;
+    if (dealer.dealerCard.length === 2 && dealer.dealerPoint === 21) {
+      if (this.players[index].cardPoint !== 21) {
+        this.players[index].score -= 5;
+      } else if (this.players[index].card.length > 2 && this.players[index].cardPoint === 21) {
+        this.players[index].score -= 15;
+      }
+    } else if (this.players[index].card.length === 2 && this.players[index].cardPoint === 21) {
+      if (dealer.dealerPoint !== 21) {
+        this.players[index].score += 5;
+      } else if (dealer.dealerCard.length > 2 && dealer.dealerPoint === 21) {
+        this.players[index].score += 15;
+      }
     }
     return oldScore;
   }

@@ -43,6 +43,22 @@ export class RoomComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.socket.on('player', (response: any) => {
+      this.isPlaying = true;
+      let serverPlayerIndex = response.players.findIndex((p: any) => p.id === this.player.players[2].socketId) + 1
+      for (let index = 0, i = 3; index < response.players.length; index++, i++, serverPlayerIndex++) {
+        if (serverPlayerIndex > 4) {
+          serverPlayerIndex = 0;
+        }
+        if (i > 4) {
+          i = 0;
+        }
+        if (Object.keys(response.players[serverPlayerIndex]).length !== 0 && response.players[serverPlayerIndex] !== undefined) {
+          this.player.players[i].socketId = response.players[serverPlayerIndex].id;
+          this.player.players[i].username = response.players[serverPlayerIndex].username;
+        }
+      }
+    })
     this.socket.on('getId', (result: any) => {
       this.player.players[2].socketId = result.id
       console.log('Your socket id is', this.player.players[2].socketId)
@@ -142,34 +158,39 @@ export class RoomComponent implements OnInit {
   }
 
   tryToJoin() {
-    this.socket.emit('join', this.player.players[2], (response: any) => {
-      if (response.position !== -1) {
-        this.isPlaying = true;
-        for (let index = 0, i = 3, serverPlayerIndex = response.position + 1; index < 4; index++, i++, serverPlayerIndex++) {
-          if (serverPlayerIndex > 4) {
-            serverPlayerIndex = 0;
-          }
-          if (i > 4) {
-            i = 0;
-          }
-          if (Object.keys(response.players[serverPlayerIndex]).length !== 0 && response.players[serverPlayerIndex] !== undefined) {
-            this.player.players[i].username = response.players[serverPlayerIndex].username;
-            this.player.players[i].socketId = response.players[serverPlayerIndex].id;
-          }
-        }
-      }
+    this.socket.emit('join', this.player.players[2])
+    // , (response: any) => {
+    //   if (response.position !== -1) {
+    //     this.isPlaying = true;
+    //     for (let index = 0, i = 3, serverPlayerIndex = response.position + 1; index < 4; index++, i++, serverPlayerIndex++) {
+    //       if (serverPlayerIndex > 4) {
+    //         serverPlayerIndex = 0;
+    //       }
+    //       if (i > 4) {
+    //         i = 0;
+    //       }
+    //       if (Object.keys(response.players[serverPlayerIndex]).length !== 0 && response.players[serverPlayerIndex] !== undefined) {
+    //         this.player.players[i].socketId = response.players[serverPlayerIndex].id;
+    //         this.socket.emit('getPlayerName', response.players[serverPlayerIndex].id, (response: any) => {
+    //           if (response.username !== '') {
+    //             this.player.players[i].username = response.username
+    //           }
+    //         })
+    //       }
+    //     }
+    //   }
 
-      //   1 -> 3 , 2 -> 4, 3 -> 5, 4 -> 1, 5 -> 2
-      // last 2 move to front
-      //   2 -> 3 , 3 -> 4, 4 -> 5, 5 -> 1, 1 -> 2
-      // last 1 move to front
-      //   3 -> 3 , 4 -> 4, 5 -> 5, 1 -> 1, 2 -> 2
-      // no move
-      //   4 -> 3 , 5 -> 4, 1 -> 5, 2 -> 1, 3 -> 2
-      // first 1 move to back
-      //   5 -> 3 , 1 -> 4, 2 -> 5, 3 -> 1, 4 -> 2
-      // first 2 move to back
-    })
+    //   1 -> 3 , 2 -> 4, 3 -> 5, 4 -> 1, 5 -> 2
+    // last 2 move to front
+    //   2 -> 3 , 3 -> 4, 4 -> 5, 5 -> 1, 1 -> 2
+    // last 1 move to front
+    //   3 -> 3 , 4 -> 4, 5 -> 5, 1 -> 1, 2 -> 2
+    // no move
+    //   4 -> 3 , 5 -> 4, 1 -> 5, 2 -> 1, 3 -> 2
+    // first 1 move to back
+    //   5 -> 3 , 1 -> 4, 2 -> 5, 3 -> 1, 4 -> 2
+    // first 2 move to back
+    // })
   }
 
   canDraw() {
@@ -188,17 +209,6 @@ export class RoomComponent implements OnInit {
 
   getScore() {
     return this.player.players[2].score;
-  }
-
-  getCard() {
-    let card = ''
-    this.player.players[2].card.forEach((c, index) => {
-      card += c
-      if (index < this.player.players[2].card.length - 1) {
-        card += ', '
-      }
-    })
-    return card
   }
 
   getCardPoint() {

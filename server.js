@@ -17,6 +17,7 @@ const io = require('socket.io')(http, {
 
 let players = [initPlayer(), initPlayer(), initPlayer(), initPlayer(), initPlayer()]
 let lastMatchTable = [initPlayer(), initPlayer(), initPlayer(), initPlayer(), initPlayer()]
+let pendingPlayers = []
 let isPlaying = false
 let dealer = {
     username: 'dealer',
@@ -71,6 +72,7 @@ function resetGame() {
     }
     dealer.card = []
     dealer.cardPoint = 0
+    pendingPlayers = []
 }
 
 function shuffleArray(array) {
@@ -147,9 +149,6 @@ function newGame() {
     console.log('')
     console.log('')
     console.log('new Game')
-    for (let i = 0; i < players.length; i++) {
-        players[i].alive = 0
-    }
     if (playingCards.length < 15) {
         for (let i = 0; i < baseCard.length; i++) {
             playingCards[i] = baseCard[i];
@@ -161,12 +160,15 @@ function newGame() {
             numberOfPlayer++
         }
     }
+    console.log('Players =', players)
+    io.emit('player', {
+        players: players
+    })
     console.log('there are', numberOfPlayer, 'players')
     shuffleArray(playingCards)
     distributeCard()
     distributeCard()
     console.log('dealer card ->', dealer.card)
-    selectedPlayer = ''
     let i = 0
     for (; i < players.length; i++) {
         if (players[i].id != '') {
@@ -209,10 +211,10 @@ function playerTimeOut(i) {
                     return;
                 }
             }
-            if (j >= players.length) {
-                dealerTurn()
-            }
+            dealerTurn()
         }, players[i].alive - new Date().getTime())
+    } else {
+        dealerTurn()
     }
 }
 
@@ -231,7 +233,9 @@ function distributeCard() {
 
 io.on('connection', socket => {
     socket.emit('getId', { 'id': socket.client.id });
-    socket.on("join", (player, callback) => {
+    socket.on("join", (player) => {
+        pendingPlayers.push(player)
+        console.log(player, 'join')
         if (ableToJoin == true) {
             ableToJoin = false
             const clientsArray = Object.keys(io.engine.clients);
@@ -240,13 +244,21 @@ io.on('connection', socket => {
                     const lastMatchIndex = lastMatchTable.findIndex(last => last.id == clientsArray[i])
                     if (lastMatchIndex != -1) {
                         players[lastMatchIndex].id = lastMatchTable[lastMatchIndex].id;
-                        players[lastMatchIndex].username = lastMatchTable[lastMatchIndex].username;
+                        if (lastMatchTable[lastMatchIndex].username != '') {
+                            players[lastMatchIndex].username = lastMatchTable[lastMatchIndex].username;
+                        }
                     } else {
                         for (let j = 0; j < players.length; j++) {
                             if (players[j].id == '') {
                                 players[j].id = clientsArray[i];
-                                if (players[j].id === player.socketId) {
-                                    players[j].username = player.username[0];
+                                let playerIndex = pendingPlayers.findIndex(pending => pending.socketId == players[j].id)
+                                if (playerIndex != -1 && pendingPlayers[playerIndex].username != '') {
+                                    if (typeof pendingPlayers[playerIndex].username === 'object') {
+                                        players[j].username = pendingPlayers[playerIndex].username[0]
+                                    }
+                                    if (typeof pendingPlayers[playerIndex].username === 'string') {
+                                        players[j].username = pendingPlayers[playerIndex].username
+                                    }
                                 }
                                 break;
                             }
@@ -258,18 +270,13 @@ io.on('connection', socket => {
                 lastMatchTable[i].id = players[i].id
                 lastMatchTable[i].username = players[i].username
             }
+            setTimeout(function () {
+                if (isPlaying == false) {
+                    isPlaying = true
+                    newGame()
+                }
+            }, 3000)
         }
-        callback({
-            position: players.findIndex(player => player.id == socket.client.id),
-            players: players
-        });
-
-        setTimeout(function () {
-            if (isPlaying == false) {
-                isPlaying = true
-                newGame()
-            }
-        }, 3000)
     });
 
     socket.on('deal', (data) => {
